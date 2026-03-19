@@ -105,4 +105,7 @@ collections_ids = {
     "Money Pot": "99f08b67-8723-4506-99e2-b16a5c58ef2a",
     "Pretty Posy": "4b38ccc3-0518-4130-89da-def5abc3a4f4",
     "Khabib’s Papakha": "182c1bca-96ef-46c5-ab45-d4b98610ff58",
+    "UFC Strike": "1211530b-fee3-4256-80a6-fa012bd413da",
+    "Pool Float": "6a36ffb9-cb5f-43bc-af63-97ec22390bc4",
+    "Mood Pack": "ef4acdf4-60c9-47b9-8501-59e2229074a4",
 }
