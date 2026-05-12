@@ -108,4 +108,5 @@ collections_ids = {
     "UFC Strike": "1211530b-fee3-4256-80a6-fa012bd413da",
     "Pool Float": "6a36ffb9-cb5f-43bc-af63-97ec22390bc4",
     "Mood Pack": "ef4acdf4-60c9-47b9-8501-59e2229074a4",
+    "Rare Bird": "de1fd7b2-bb97-4551-af27-5f4f57594134"
 }
