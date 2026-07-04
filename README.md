@@ -144,6 +144,53 @@ Gift names resolve leniently — `"plush pepe"`, `"Durov's Cap"` and `"Durov’s
 
 ---
 
+## Your gifts & inventory
+
+See everything you own, then unlist, quick-sell, transfer or withdraw it.
+
+```python
+# full inventory — everything you own (listed or not)
+mine = await portals.inventory(offset=0, limit=50, authData=AUTH)
+for g in mine:
+    print(g.name, g.model, g.status)
+
+groups = await portals.inventoryCollections(authData=AUTH)   # grouped by collection, with counts
+value  = await portals.inventoryValue(authData=AUTH)          # estimated inventory value (GRAM)
+
+# only your marketplace listings
+listed = await portals.myPortalsGifts(listed=True, authData=AUTH)
+
+# take a gift off sale
+await portals.unlist(nft_id=mine[0].id, authData=AUTH)              # or bulkUnlist(nft_ids=[...])
+
+# instant-sell into the best collection offer
+await portals.quickSalePreview(nft_ids=[mine[0].id], authData=AUTH)  # preview payout
+await portals.quickSale(nft_ids=[mine[0].id], authData=AUTH)
+
+# withdraw the gift out of Portals (to your Telegram account)
+await portals.withdrawGifts(nft_ids=[mine[0].id], authData=AUTH)
+
+# or transfer it to another Portals user
+await portals.transferGifts(nft_ids=[mine[0].id], username="someone", authData=AUTH)
+
+# check gifts are still available before buying
+await portals.checkAvailability(nft_ids=[some_id], authData=AUTH)
+```
+
+| Function | Purpose |
+| --- | --- |
+| `inventory(offset, limit, authData)` | Every gift you own (listed or not) |
+| `inventoryCollections(authData)` | Inventory grouped by collection, with counts |
+| `inventoryValue(authData)` | Estimated total inventory value (GRAM) |
+| `myPortalsGifts(offset, limit, listed, authData)` | Your gifts by marketplace listing status |
+| `unlist(nft_id, authData)` / `bulkUnlist(nft_ids, authData)` | Remove gift(s) from sale |
+| `quickSalePreview / quickSale(nft_ids, authData)` | Preview & instant-sell into the top offer |
+| `checkAvailability(nft_ids, authData)` | Check gifts are still available |
+| `withdrawGifts(nft_ids, authData)` | Withdraw gifts out of Portals (to Telegram) |
+| `transferGifts(nft_ids, username, anonymous, authData)` | Transfer gifts to another user |
+
+---
+
 ## Offers
 
 ```python

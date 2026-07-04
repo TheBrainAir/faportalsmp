@@ -450,6 +450,72 @@ async def myPortalsGifts(offset: int = 0, limit: int = 20, listed: bool = True, 
 
     return [PortalsGift(nft) for nft in response.json()['nfts']] if "nfts" in response.json() else []
 
+async def inventory(offset: int = 0, limit: int = 20, authData: str = "") -> list[PortalsGift]:
+    """
+    Retrieves your full Portals inventory — every gift you own, whether listed
+    for sale or not (``GET /inventory``).
+
+    This differs from ``myPortalsGifts`` (which is scoped to the marketplace
+    listing status): use ``inventory`` to see everything you hold, including
+    gifts you can withdraw to Telegram.
+
+    Args:
+        offset (int): Pagination offset. Defaults to 0.
+        limit (int): Maximum number of items to return. Defaults to 20.
+        authData (str): The authentication data required for the API request.
+
+    Returns:
+        list[PortalsGift]: The gifts in your inventory.
+
+    Raises:
+        authDataError: If authData is not provided.
+        requestError: If the API request fails.
+    """
+    if not authData:
+        raise authDataError("aportalsmp: inventory(): Error: authData is required")
+
+    URL = API_URL + f"inventory?offset={offset}&limit={limit}"
+    HEADERS = {**HEADERS_MAIN, "Authorization": authData}
+
+    response = await fetch(method="GET", url=URL, headers=HEADERS, impersonate="chrome110")
+
+    requestExceptionHandler(response, "inventory")
+
+    data = response.json()
+    items = data.get("nfts") or data.get("inventory") or data.get("results") or data.get("items") \
+        if isinstance(data, dict) else data
+    return [PortalsGift(nft) for nft in items] if isinstance(items, list) else []
+
+async def inventoryCollections(authData: str = "") -> list:
+    """
+    Retrieves your inventory grouped by collection, with per-collection counts
+    (``GET /inventory/collections``).
+
+    Args:
+        authData (str): The authentication data required for the API request.
+
+    Returns:
+        list: Raw per-collection inventory entries (collection info + counts).
+
+    Raises:
+        authDataError: If authData is not provided.
+        requestError: If the API request fails.
+    """
+    if not authData:
+        raise authDataError("aportalsmp: inventoryCollections(): Error: authData is required")
+
+    URL = API_URL + "inventory/collections"
+    HEADERS = {**HEADERS_MAIN, "Authorization": authData}
+
+    response = await fetch(method="GET", url=URL, headers=HEADERS, impersonate="chrome110")
+
+    requestExceptionHandler(response, "inventoryCollections")
+
+    data = response.json()
+    if isinstance(data, dict):
+        return data.get("collections") or data.get("results") or []
+    return data if isinstance(data, list) else []
+
 async def myActivity(offset: int = 0, limit: int = 20, authData: str = "") -> list[MyActivity]:
     """
     Retrieves the user's activity on the marketplace.
@@ -734,3 +800,158 @@ async def withdrawGifts(nft_ids: list = [], authData: str = "") -> None:
     requestExceptionHandler(response, "withdrawGifts")
 
     return None
+
+async def unlist(nft_id: str = "", authData: str = "") -> None:
+    """
+    Removes a single gift from sale (cancels its listing).
+
+    Args:
+        nft_id (str): The NFT id to unlist.
+        authData (str): The authentication data required for the API request.
+
+    Returns:
+        None: on success.
+
+    Raises:
+        authDataError: If authData is not provided.
+        tradingError: If nft_id is not provided.
+        requestError: If the API request fails.
+    """
+    if not nft_id:
+        raise tradingError("aportalsmp: unlist(): Error: nft_id is required")
+    return await bulkUnlist(nft_ids=[nft_id], authData=authData)
+
+async def bulkUnlist(nft_ids: list = [], authData: str = "") -> None:
+    """
+    Removes multiple gifts from sale in one call (``POST /nfts/bulk-unlist``).
+
+    Args:
+        nft_ids (list): A non-empty list of NFT ids to unlist.
+        authData (str): The authentication data required for the API request.
+
+    Returns:
+        None: on success.
+
+    Raises:
+        authDataError: If authData is not provided.
+        tradingError: If nft_ids is not a non-empty list.
+        requestError: If the API request fails.
+    """
+    URL = API_URL + "nfts/bulk-unlist"
+
+    if not authData:
+        raise authDataError("aportalsmp: bulkUnlist(): Error: authData is required")
+    if type(nft_ids) != list or len(nft_ids) == 0:
+        raise tradingError("aportalsmp: bulkUnlist(): Error: nft_ids must be a non-empty list")
+
+    HEADERS = {**HEADERS_MAIN, "Authorization": authData}
+    PAYLOAD = {"nft_ids": nft_ids}
+
+    response = await fetch(method="POST", url=URL, json=PAYLOAD, headers=HEADERS, impersonate="chrome110")
+
+    requestExceptionHandler(response, "bulkUnlist")
+
+    return None
+
+async def checkAvailability(nft_ids: list = [], authData: str = "") -> dict:
+    """
+    Checks whether the given gifts are still available (e.g. before buying)
+    (``POST /nfts/check-availability``).
+
+    Args:
+        nft_ids (list): A non-empty list of NFT ids to check.
+        authData (str): The authentication data required for the API request.
+
+    Returns:
+        dict: The raw availability response from the API.
+
+    Raises:
+        authDataError: If authData is not provided.
+        tradingError: If nft_ids is not a non-empty list.
+        requestError: If the API request fails.
+    """
+    URL = API_URL + "nfts/check-availability"
+
+    if not authData:
+        raise authDataError("aportalsmp: checkAvailability(): Error: authData is required")
+    if type(nft_ids) != list or len(nft_ids) == 0:
+        raise tradingError("aportalsmp: checkAvailability(): Error: nft_ids must be a non-empty list")
+
+    HEADERS = {**HEADERS_MAIN, "Authorization": authData}
+    PAYLOAD = {"nft_ids": nft_ids}
+
+    response = await fetch(method="POST", url=URL, json=PAYLOAD, headers=HEADERS, impersonate="chrome110")
+
+    requestExceptionHandler(response, "checkAvailability")
+
+    return response.json()
+
+async def quickSalePreview(nft_ids: list = [], authData: str = "") -> dict:
+    """
+    Previews an instant sale of gifts against the best available collection
+    offers, returning the payout plan(s) (``POST /nfts/quick-sale/preview``).
+
+    Args:
+        nft_ids (list): A non-empty list of NFT ids to preview selling.
+        authData (str): The authentication data required for the API request.
+
+    Returns:
+        dict: The preview payload (expected payout and plan id to pass to quickSale).
+
+    Raises:
+        authDataError: If authData is not provided.
+        tradingError: If nft_ids is not a non-empty list.
+        requestError: If the API request fails.
+    """
+    URL = API_URL + "nfts/quick-sale/preview"
+
+    if not authData:
+        raise authDataError("aportalsmp: quickSalePreview(): Error: authData is required")
+    if type(nft_ids) != list or len(nft_ids) == 0:
+        raise tradingError("aportalsmp: quickSalePreview(): Error: nft_ids must be a non-empty list")
+
+    HEADERS = {**HEADERS_MAIN, "Authorization": authData}
+    PAYLOAD = {"nft_ids": nft_ids}
+
+    response = await fetch(method="POST", url=URL, json=PAYLOAD, headers=HEADERS, impersonate="chrome110")
+
+    requestExceptionHandler(response, "quickSalePreview")
+
+    return response.json()
+
+async def quickSale(nft_ids: list = [], plan_id: str = "", authData: str = "") -> dict:
+    """
+    Instantly sells gifts into the best available collection offers
+    (``POST /nfts/quick-sale``). Call :func:`quickSalePreview` first to obtain a
+    ``plan_id`` if the marketplace requires one.
+
+    Args:
+        nft_ids (list): A non-empty list of NFT ids to sell.
+        plan_id (str): Optional payout plan id returned by quickSalePreview.
+        authData (str): The authentication data required for the API request.
+
+    Returns:
+        dict: The raw quick-sale result.
+
+    Raises:
+        authDataError: If authData is not provided.
+        tradingError: If nft_ids is not a non-empty list.
+        requestError: If the API request fails.
+    """
+    URL = API_URL + "nfts/quick-sale"
+
+    if not authData:
+        raise authDataError("aportalsmp: quickSale(): Error: authData is required")
+    if type(nft_ids) != list or len(nft_ids) == 0:
+        raise tradingError("aportalsmp: quickSale(): Error: nft_ids must be a non-empty list")
+
+    HEADERS = {**HEADERS_MAIN, "Authorization": authData}
+    PAYLOAD = {"nft_ids": nft_ids}
+    if plan_id:
+        PAYLOAD["plan_id"] = plan_id
+
+    response = await fetch(method="POST", url=URL, json=PAYLOAD, headers=HEADERS, impersonate="chrome110")
+
+    requestExceptionHandler(response, "quickSale")
+
+    return response.json()

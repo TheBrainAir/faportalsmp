@@ -90,6 +90,33 @@ async def myBalances(authData: str = "") -> Balances:
 
     return Balances(response.json())
 
+async def inventoryValue(authData: str = "") -> dict:
+    """
+    Retrieves the estimated total value/cost of your inventory in GRAM
+    (``GET /users/me/inventory/cost``).
+
+    Args:
+        authData (str): The authentication data required for the API request.
+
+    Returns:
+        dict: The raw inventory cost/value payload.
+
+    Raises:
+        authDataError: If authData is not provided.
+        requestError: If the API request fails.
+    """
+    if not authData:
+        raise authDataError("aportalsmp: inventoryValue(): Error: authData is required")
+
+    URL = API_URL + "users/me/inventory/cost"
+    HEADERS = {**HEADERS_MAIN, "Authorization": authData}
+
+    response = await fetch(method="GET", url=URL, headers=HEADERS, impersonate="chrome110")
+
+    requestExceptionHandler(response, "inventoryValue")
+
+    return response.json()
+
 # TON withdrawal moved to wallet.py. Re-exported here for backwards compatibility
 # (`from aportalsmp.account import withdrawPortals` still works).
 from .wallet import withdrawGram, withdrawTon, withdrawPortals  # noqa: E402,F401

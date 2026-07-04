@@ -233,6 +233,7 @@
       <nav>
         <a href="#auth">Authentication</a>
         <a href="#gifts">Working with gifts</a>
+        <a href="#owned">Your gifts &amp; inventory</a>
         <a href="#offers">Working with offers</a>
         <a href="#account">Working with your account</a>
         <a href="#wallet">Wallet · GRAM</a>
@@ -360,6 +361,44 @@ authData = <span class="k">await</span> <span class="f">update_auth</span>(sessi
           <div class="sig"><code><span class="k">async def</span> <span class="name">sale</span>(nft_id, price, authData) · <span class="name">bulkList</span>(nfts, authData)</code><span class="ret">→ SaleResult</span></div>
           <div class="doc"><p>List a single gift (<code>sale</code>) or many at once (<code>bulkList</code>, a list of <code>{"nft_id", "price"}</code>) for sale in GRAM.</p></div>
         </div>
+
+        <h3 id="owned">Your gifts &amp; inventory</h3>
+        <p>See everything you own, then unlist, quick-sell, transfer or withdraw it to Telegram.</p>
+        <pre><code><span class="c"># view — full inventory (everything you own)</span>
+mine = <span class="k">await</span> portals.<span class="f">inventory</span>(offset=<span class="n">0</span>, limit=<span class="n">50</span>, authData=authData)
+<span class="k">for</span> g <span class="k">in</span> mine:
+    <span class="f">print</span>(g.name, g.model, g.status)
+
+<span class="c"># or only your marketplace listings</span>
+listed = <span class="k">await</span> portals.<span class="f">myPortalsGifts</span>(listed=<span class="k">True</span>, authData=authData)
+
+<span class="c"># take a listing off sale</span>
+<span class="k">await</span> portals.<span class="f">unlist</span>(nft_id=mine[<span class="n">0</span>].id, authData=authData)
+
+<span class="c"># instant-sell into the best collection offer</span>
+plan = <span class="k">await</span> portals.<span class="f">quickSalePreview</span>(nft_ids=[mine[<span class="n">0</span>].id], authData=authData)
+<span class="k">await</span> portals.<span class="f">quickSale</span>(nft_ids=[mine[<span class="n">0</span>].id], authData=authData)
+
+<span class="c"># withdraw the gift out of Portals (to your Telegram account)</span>
+<span class="k">await</span> portals.<span class="f">withdrawGifts</span>(nft_ids=[mine[<span class="n">0</span>].id], authData=authData)
+
+<span class="c"># or transfer it to another user inside Portals</span>
+<span class="k">await</span> portals.<span class="f">transferGifts</span>(nft_ids=[mine[<span class="n">0</span>].id], username=<span class="s">"someone"</span>, authData=authData)</code></pre>
+
+        <div class="tbl"><table>
+          <thead><tr><th>Function</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td><code>inventory(offset, limit, authData)</code></td><td>Every gift you own (listed or not)</td></tr>
+            <tr><td><code>inventoryCollections(authData)</code></td><td>Your inventory grouped by collection, with counts</td></tr>
+            <tr><td><code>inventoryValue(authData)</code></td><td>Estimated total value of your inventory (GRAM)</td></tr>
+            <tr><td><code>myPortalsGifts(offset, limit, listed, authData)</code></td><td>Your gifts filtered by marketplace listing status</td></tr>
+            <tr><td><code>unlist(nft_id, authData)</code> · <code>bulkUnlist(nft_ids, authData)</code></td><td>Remove gift(s) from sale</td></tr>
+            <tr><td><code>quickSalePreview / quickSale(nft_ids, authData)</code></td><td>Preview &amp; execute an instant sale into the top offer</td></tr>
+            <tr><td><code>checkAvailability(nft_ids, authData)</code></td><td>Check gifts are still available (e.g. before buying)</td></tr>
+            <tr><td><code>withdrawGifts(nft_ids, authData)</code></td><td>Withdraw gifts out of Portals (to Telegram)</td></tr>
+            <tr><td><code>transferGifts(nft_ids, username, anonymous, authData)</code></td><td>Transfer gifts to another user inside Portals</td></tr>
+          </tbody>
+        </table></div>
 
         <p>The rest of the gifts module:</p>
         <div class="tbl"><table>
