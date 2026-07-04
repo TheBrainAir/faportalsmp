@@ -955,3 +955,153 @@ async def quickSale(nft_ids: list = [], plan_id: str = "", authData: str = "") -
     requestExceptionHandler(response, "quickSale")
 
     return response.json()
+
+# ================ Advanced floors & config ================
+
+async def backdropFloors(gift_name: str = "", authData: str = "") -> dict:
+    """
+    Per-backdrop floor prices for a collection
+    (``GET /collections/filters/backdrops/floors``).
+
+    Args:
+        gift_name (str): The collection name (resolved to its short name).
+        authData (str): The authentication data required for the API request.
+
+    Returns:
+        dict: The raw backdrop floors payload.
+
+    Raises:
+        authDataError: If authData is not provided.
+        floorsError: If gift_name is not provided.
+        requestError: If the API request fails.
+    """
+    if not authData:
+        raise authDataError("aportalsmp: backdropFloors(): Error: authData is required")
+    if not gift_name:
+        raise floorsError("aportalsmp: backdropFloors(): Error: gift_name is required")
+
+    URL = API_URL + f"collections/filters/backdrops/floors?short_names={toShortName(gift_name)}"
+    HEADERS = {**HEADERS_MAIN, "Authorization": authData}
+
+    response = await fetch(method="GET", url=URL, headers=HEADERS, impersonate="chrome110")
+
+    requestExceptionHandler(response, "backdropFloors")
+
+    return response.json()
+
+async def modelBackgroundFloors(gift_name: str = "", authData: str = "") -> dict:
+    """
+    Per-model / per-background floor prices for a collection
+    (``GET /collections/models/backgrounds/floors``).
+
+    Args:
+        gift_name (str): The collection name (resolved to its short name).
+        authData (str): The authentication data required for the API request.
+
+    Returns:
+        dict: The raw model/background floors payload.
+
+    Raises:
+        authDataError: If authData is not provided.
+        floorsError: If gift_name is not provided.
+        requestError: If the API request fails.
+    """
+    if not authData:
+        raise authDataError("aportalsmp: modelBackgroundFloors(): Error: authData is required")
+    if not gift_name:
+        raise floorsError("aportalsmp: modelBackgroundFloors(): Error: gift_name is required")
+
+    URL = API_URL + f"collections/models/backgrounds/floors?short_names={toShortName(gift_name)}"
+    HEADERS = {**HEADERS_MAIN, "Authorization": authData}
+
+    response = await fetch(method="GET", url=URL, headers=HEADERS, impersonate="chrome110")
+
+    requestExceptionHandler(response, "modelBackgroundFloors")
+
+    return response.json()
+
+async def attributeFloors(payload: dict = None, authData: str = "") -> dict:
+    """
+    Floor prices for specific attribute combinations (``POST /nfts/attribute-floors``).
+
+    The request body is marketplace-defined; pass it as ``payload``
+    (e.g. collection + attribute filters).
+
+    Args:
+        payload (dict): The attribute-floors request body.
+        authData (str): The authentication data required for the API request.
+
+    Returns:
+        dict: The raw attribute floors payload.
+
+    Raises:
+        authDataError: If authData is not provided.
+        floorsError: If payload is not provided.
+        requestError: If the API request fails.
+    """
+    if not authData:
+        raise authDataError("aportalsmp: attributeFloors(): Error: authData is required")
+    if not payload:
+        raise floorsError("aportalsmp: attributeFloors(): Error: payload is required")
+
+    URL = API_URL + "nfts/attribute-floors"
+    HEADERS = {**HEADERS_MAIN, "Authorization": authData}
+
+    response = await fetch(method="POST", url=URL, json=payload, headers=HEADERS, impersonate="chrome110")
+
+    requestExceptionHandler(response, "attributeFloors")
+
+    return response.json()
+
+async def marketConfig(authData: str = "") -> dict:
+    """
+    Marketplace configuration (fees, feature flags, etc.) (``GET /market/config``).
+
+    Args:
+        authData (str): The authentication data required for the API request.
+
+    Returns:
+        dict: The raw market config payload.
+
+    Raises:
+        authDataError: If authData is not provided.
+        requestError: If the API request fails.
+    """
+    if not authData:
+        raise authDataError("aportalsmp: marketConfig(): Error: authData is required")
+
+    URL = API_URL + "market/config"
+    HEADERS = {**HEADERS_MAIN, "Authorization": authData}
+
+    response = await fetch(method="GET", url=URL, headers=HEADERS, impersonate="chrome110")
+
+    requestExceptionHandler(response, "marketConfig")
+
+    return response.json()
+
+async def inventoryCostHistory(authData: str = "") -> dict:
+    """
+    Historical value of your inventory over time
+    (``GET /users/inventories/me/cost/history``).
+
+    Args:
+        authData (str): The authentication data required for the API request.
+
+    Returns:
+        dict: The raw inventory cost history payload.
+
+    Raises:
+        authDataError: If authData is not provided.
+        requestError: If the API request fails.
+    """
+    if not authData:
+        raise authDataError("aportalsmp: inventoryCostHistory(): Error: authData is required")
+
+    URL = API_URL + "users/inventories/me/cost/history"
+    HEADERS = {**HEADERS_MAIN, "Authorization": authData}
+
+    response = await fetch(method="GET", url=URL, headers=HEADERS, impersonate="chrome110")
+
+    requestExceptionHandler(response, "inventoryCostHistory")
+
+    return response.json()

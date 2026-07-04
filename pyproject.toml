@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "faportalsmp"
-version = "2.1.0"
+version = "2.2.0"
 description = "An Asynchronous Python Library for interacting with the Portals Gift Marketplace API (TON deposits & withdrawals, gifts trading, offers, giveaways)"
 readme = "README.md"
 requires-python = ">=3.8"

@@ -237,6 +237,8 @@
         <a href="#offers">Working with offers</a>
         <a href="#account">Working with your account</a>
         <a href="#wallet">Wallet · GRAM</a>
+        <a href="#advanced">Advanced trading</a>
+        <a href="#rewards">Referrals &amp; cashback</a>
       </nav>
     </div>
     <div class="navgroup">
@@ -501,6 +503,50 @@ statuses = <span class="k">await</span> portals.<span class="f">withdrawStatus</
         <div class="fn" id="wallet-limits">
           <div class="sig"><span class="m get">get</span> <code><span class="k">async def</span> <span class="name">walletLimits</span>(authData) · <span class="name">walletHistory</span>(offset, limit, authData) · <span class="name">withdrawStatus</span>(ids, authData)</code></div>
           <div class="doc"><p><code>walletLimits</code> → min/max amounts, daily limit &amp; fees. <code>walletHistory</code> → deposits, withdrawals and trades. <code>withdrawStatus</code> → poll withdrawals by id.</p></div>
+        </div>
+      </section>
+
+      <section id="advanced">
+        <h2>Advanced trading</h2>
+        <p>Granular floors, market config, portfolio history and premarket orders. These return raw API dicts.</p>
+        <div class="tbl"><table>
+          <thead><tr><th>Function</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td><code>backdropFloors(gift_name, authData)</code></td><td>Per-backdrop floor prices for a collection</td></tr>
+            <tr><td><code>modelBackgroundFloors(gift_name, authData)</code></td><td>Per-model / per-background floor prices</td></tr>
+            <tr><td><code>attributeFloors(payload, authData)</code></td><td>Floors for specific attribute combinations</td></tr>
+            <tr><td><code>marketConfig(authData)</code></td><td>Marketplace config (fees, feature flags)</td></tr>
+            <tr><td><code>inventoryCostHistory(authData)</code></td><td>Historical value of your inventory over time</td></tr>
+          </tbody>
+        </table></div>
+        <h3>Premarket orders</h3>
+        <p>Collateral-based premarket orders. The POST bodies are marketplace-defined — pass them as <code>payload</code>.</p>
+        <div class="tbl"><table>
+          <thead><tr><th>Function</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td><code>premarketCollaterals(authData)</code></td><td>Available collateral options</td></tr>
+            <tr><td><code>premarketCollections(authData)</code></td><td>Collections that support premarket</td></tr>
+            <tr><td><code>premarketPreviewGift(payload, authData)</code></td><td>Preview adding a gift to a premarket order</td></tr>
+            <tr><td><code>premarketAddGift(payload, authData)</code></td><td>Add a gift to a premarket order</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <section id="rewards">
+        <h2>Referrals &amp; cashback</h2>
+        <pre><code><span class="c"># referrals</span>
+info    = <span class="k">await</span> portals.<span class="f">referralInfo</span>(authData=authData)
+friends = <span class="k">await</span> portals.<span class="f">referralFriends</span>(offset=<span class="n">0</span>, limit=<span class="n">20</span>, authData=authData)
+<span class="k">await</span> portals.<span class="f">applyReferral</span>(code=<span class="s">"FRIEND_CODE"</span>, authData=authData)
+<span class="k">await</span> portals.<span class="f">claimReferral</span>(authData=authData)
+
+<span class="c"># cashback</span>
+cb = <span class="k">await</span> portals.<span class="f">cashbackInfo</span>(authData=authData)
+<span class="k">await</span> portals.<span class="f">claimCashback</span>(authData=authData)</code></pre>
+        <div class="chips">
+          <span class="chip">referralInfo</span><span class="chip">referralFriends</span><span class="chip">referralLevels</span>
+          <span class="chip">applyReferral</span><span class="chip">claimReferral</span><span class="chip">cashbackInfo</span>
+          <span class="chip">cashbackLevels</span><span class="chip">claimCashback</span>
         </div>
       </section>
 

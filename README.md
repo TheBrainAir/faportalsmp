@@ -207,6 +207,42 @@ placed   = await portals.myPlacedOffers(authData=AUTH)
 
 ---
 
+## Advanced trading
+
+Granular floors, market config, portfolio history and premarket orders (these return raw API dicts):
+
+```python
+await portals.backdropFloors(gift_name="Plush Pepe", authData=AUTH)
+await portals.modelBackgroundFloors(gift_name="Plush Pepe", authData=AUTH)
+await portals.attributeFloors(payload={...}, authData=AUTH)
+await portals.marketConfig(authData=AUTH)
+await portals.inventoryCostHistory(authData=AUTH)
+
+# premarket (collateral-based; POST bodies are marketplace-defined)
+await portals.premarketCollaterals(authData=AUTH)
+await portals.premarketCollections(authData=AUTH)
+await portals.premarketPreviewGift(payload={...}, authData=AUTH)
+await portals.premarketAddGift(payload={...}, authData=AUTH)
+```
+
+## Referrals & cashback
+
+```python
+# referrals
+await portals.referralInfo(authData=AUTH)
+await portals.referralFriends(offset=0, limit=20, authData=AUTH)
+await portals.referralLevels(authData=AUTH)
+await portals.applyReferral(code="FRIEND_CODE", authData=AUTH)
+await portals.claimReferral(authData=AUTH)
+
+# cashback
+await portals.cashbackInfo(authData=AUTH)
+await portals.cashbackLevels(authData=AUTH)
+await portals.claimCashback(authData=AUTH)
+```
+
+---
+
 ## Keeping the gift list fresh
 
 Collection IDs live in `aportalsmp/utils/collections_ids.py` and are generated
