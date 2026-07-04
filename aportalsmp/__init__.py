@@ -2,7 +2,16 @@ from .account import (
     myPoints,
     myStats,
     myBalances,
-    withdrawPortals
+)
+from .wallet import (
+    deposit,
+    depositStatus,
+    withdrawGram,
+    withdrawTon,
+    withdrawPortals,
+    withdrawStatus,
+    walletLimits,
+    walletHistory,
 )
 from .auth import update_auth
 
@@ -13,6 +22,11 @@ from .classes.Objects import (
     Points,
     Stats,
     Balances,
+    DepositInfo,
+    DepositStatus,
+    WithdrawStatus,
+    WalletLimits,
+    WalletHistory,
     Filters,
     GiftsFloors,
     Collections,
@@ -71,14 +85,22 @@ from .offers import (
 from .utils.functions import (
     toShortName,
     convertForBuying,
-    convertForListing
+    convertForListing,
+    resolve_collection_id
 )
 
 __all__ = [
     "myPoints",
     "myStats",
     "myBalances",
+    "deposit",
+    "depositStatus",
+    "withdrawGram",
+    "withdrawTon",
     "withdrawPortals",
+    "withdrawStatus",
+    "walletLimits",
+    "walletHistory",
     "update_auth",
     "giftsFloors",
     "filterFloors",
@@ -105,6 +127,7 @@ __all__ = [
     "toShortName",
     "convertForBuying",
     "convertForListing",
+    "resolve_collection_id",
     "getGiveaways",
     "giveawayInfo",
     "joinGiveaway",

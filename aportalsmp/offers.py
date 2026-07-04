@@ -1,4 +1,6 @@
-from .utils.functions import cap
+from __future__ import annotations
+
+from .utils.functions import cap, resolve_collection_id
 from .utils.other import API_URL, HEADERS_MAIN
 from .utils.collections_ids import collections_ids
 from .classes.Exceptions import authDataError, offerError
@@ -163,9 +165,7 @@ async def collectionOffer(gift_name: str = "", amount: float | int = 0, expirati
     if expiration_days not in [0,7]:
         raise offerError("aportalsmp: collectionOffer(): Error: expiration_days must be 0 (no expiration) or 7 (7 days)")
 
-    gift_name = cap(gift_name)
-
-    ID = collections_ids.get(gift_name, None)
+    ID = resolve_collection_id(gift_name)
 
     if ID is None:
         raise offerError("aportalsmp: collectionOffer(): Error: gift_name is invalid")
@@ -280,8 +280,7 @@ async def allCollectionOffers(gift_name: str = "", authData: str = "") -> list[C
     if not gift_name:
         raise offerError("aportalsmp: allCollectionOffers(): Error: gift_name is required")
     
-    gift_name = cap(gift_name)
-    ID = collections_ids.get(gift_name, None)
+    ID = resolve_collection_id(gift_name)
 
     if ID is None:
         raise offerError("aportalsmp: allCollectionOffers(): Error: gift_name is invalid")
@@ -314,9 +313,8 @@ async def topOffer(gift_name: str = "", authData: str = "") -> CollectionOffer |
 
     URL = API_URL + "collection-offers/"
 
-    try:
-        ID = collections_ids[cap(gift_name)]
-    except:
+    ID = resolve_collection_id(gift_name)
+    if ID is None:
         raise offerError("aportalsmp: topOffer(): Error: gift_name is invalid")
 
     if authData == "":

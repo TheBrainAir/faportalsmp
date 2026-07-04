@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .utils.other import API_URL, HEADERS_MAIN
 from .handlers import fetch, requestExceptionHandler
 from .classes.Exceptions import accountError, authDataError
@@ -88,42 +90,6 @@ async def myBalances(authData: str = "") -> Balances:
 
     return Balances(response.json())
 
-async def withdrawPortals(amount: float = 0, wallet: str = "", authData: str = "") -> str:
-    """
-    Withdraw Portals from the user's wallet to an external address.
-
-    Args:
-        amount (float): The amount of Portals to withdraw.
-        wallet (str): The external address to withdraw to.
-        authData (str): The authentication data required for the API request.
-
-    Returns:
-        str: The ID of the withdrawal.
-
-    Raises:
-        Exception: If amount is not provided.
-        Exception: If wallet is not provided.
-        Exception: If authData is not provided.
-        Exception: If the API request fails or returns a non-200 status code.
-    """
-    URL = API_URL + "users/wallets/withdraw"
-
-    if amount == 0:
-        raise accountError("aportalsmp: withdrawPortals(): Error: amount is required")
-    if not wallet:
-        raise accountError("aportalsmp: withdrawPortals(): Error: wallet is required")
-    if not authData:
-        raise authDataError("aportalsmp: withdrawPortals(): Error: authData is required")
-
-    HEADERS = {**HEADERS_MAIN, "Authorization": authData}
-
-    PAYLOAD = {
-        "amount": str(amount),
-        "external_address": wallet
-        }
-    
-    response = await fetch(method="POST", url=URL, json=PAYLOAD, headers=HEADERS, impersonate="chrome110")
-
-    requestExceptionHandler(response, "withdrawPortals")
-
-    return response.json().get("id", None) if response.status_code == 200 else None
+# TON withdrawal moved to wallet.py. Re-exported here for backwards compatibility
+# (`from aportalsmp.account import withdrawPortals` still works).
+from .wallet import withdrawGram, withdrawTon, withdrawPortals  # noqa: E402,F401

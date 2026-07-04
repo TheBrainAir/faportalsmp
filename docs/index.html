@@ -1,0 +1,514 @@
+<title>faportalsmp — Portals Gift Marketplace API for Python</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #ffffff;
+    --sidebar: #f7f9fc;
+    --border: #e7ecf3;
+    --border-soft: #eef2f7;
+    --text: #1a2333;
+    --text-dim: #566379;
+    --text-faint: #8b99ae;
+    --accent: #2b6cff;
+    --accent-soft: rgba(43,108,255,0.09);
+    --accent-line: rgba(43,108,255,0.28);
+    --gram: #0e9f78;
+    --gram-soft: rgba(14,159,120,0.10);
+    --warn: #b26a00;
+    --warn-soft: rgba(178,106,0,0.10);
+    --code-bg: #f5f7fb;
+    --code-border: #e7ecf3;
+    --code-text: #26324a;
+    --c-com: #97a3b6;
+    --c-str: #10855f;
+    --c-kw: #8338b0;
+    --c-num: #b2560b;
+    --c-fn: #2b6cff;
+    --radius: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0d131f;
+      --sidebar: #0a0f19;
+      --border: #1e2a3d;
+      --border-soft: #17212f;
+      --text: #e6edf8;
+      --text-dim: #9db0cd;
+      --text-faint: #6a7c9a;
+      --accent: #5c9bff;
+      --accent-soft: rgba(92,155,255,0.13);
+      --accent-line: rgba(92,155,255,0.35);
+      --gram: #34d6a6;
+      --gram-soft: rgba(52,214,166,0.12);
+      --warn: #f2b455;
+      --warn-soft: rgba(242,180,85,0.12);
+      --code-bg: #0a0f1a;
+      --code-border: #1c2739;
+      --code-text: #d5e1f4;
+      --c-com: #647694;
+      --c-str: #6bd7a8;
+      --c-kw: #c58bf0;
+      --c-num: #e6a45f;
+      --c-fn: #6ba5ff;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d131f;
+    --sidebar: #0a0f19;
+    --border: #1e2a3d;
+    --border-soft: #17212f;
+    --text: #e6edf8;
+    --text-dim: #9db0cd;
+    --text-faint: #6a7c9a;
+    --accent: #5c9bff;
+    --accent-soft: rgba(92,155,255,0.13);
+    --accent-line: rgba(92,155,255,0.35);
+    --gram: #34d6a6;
+    --gram-soft: rgba(52,214,166,0.12);
+    --warn: #f2b455;
+    --warn-soft: rgba(242,180,85,0.12);
+    --code-bg: #0a0f1a;
+    --code-border: #1c2739;
+    --code-text: #d5e1f4;
+    --c-com: #647694;
+    --c-str: #6bd7a8;
+    --c-kw: #c58bf0;
+    --c-num: #e6a45f;
+    --c-fn: #6ba5ff;
+  }
+
+  html { scroll-behavior: smooth; scroll-padding-top: 20px; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    background: var(--bg); color: var(--text); font-size: 15.5px; line-height: 1.68;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+
+  /* ---------- Shell ---------- */
+  .shell { display: grid; grid-template-columns: 272px minmax(0,1fr); max-width: 1240px; margin: 0 auto; }
+
+  /* ---------- Sidebar ---------- */
+  aside {
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    background: var(--sidebar); border-right: 1px solid var(--border);
+    padding: 22px 16px 40px 22px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 4px 6px 18px; }
+  .mark {
+    width: 26px; height: 26px; flex: none; transform: rotate(45deg); border-radius: 6px;
+    background: linear-gradient(150deg, var(--accent), #6aa0ff);
+    box-shadow: inset 0 0 0 1.4px rgba(255,255,255,0.3), 0 3px 10px var(--accent-soft);
+  }
+  .brand b { font-size: 16px; font-weight: 750; letter-spacing: -0.01em; }
+  .brand small { display:block; font-size: 11px; color: var(--text-faint); font-weight: 500; letter-spacing: .02em; }
+  .navgroup { margin-top: 16px; }
+  .navgroup > p {
+    font-size: 11px; letter-spacing: 0.11em; text-transform: uppercase; font-weight: 700;
+    color: var(--text-faint); padding: 0 8px; margin-bottom: 5px;
+  }
+  aside a {
+    display: block; color: var(--text-dim); font-size: 14px; font-weight: 500;
+    padding: 5px 10px; border-radius: 7px; border-left: 2px solid transparent;
+  }
+  aside a:hover { background: var(--accent-soft); color: var(--text); text-decoration: none; }
+
+  /* ---------- Content ---------- */
+  main { min-width: 0; padding: 0 46px 120px; }
+  .wrap { max-width: 800px; margin: 0 auto; }
+  .topbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 0 12px; background: linear-gradient(var(--bg), var(--bg) 70%, transparent); }
+  .crumb { font-size: 13px; color: var(--text-faint); }
+  .crumb b { color: var(--text-dim); font-weight: 600; }
+
+  .hero { padding: 26px 0 6px; border-bottom: 1px solid var(--border-soft); margin-bottom: 8px; }
+  .hero h1 { font-size: clamp(30px, 4vw, 40px); font-weight: 820; letter-spacing: -0.025em; line-height: 1.06; text-wrap: balance; }
+  .hero p { font-size: 17px; color: var(--text-dim); margin-top: 12px; max-width: 60ch; }
+  .piprow { display: flex; align-items: center; gap: 10px; margin: 18px 0 8px; background: var(--code-bg); border: 1px solid var(--code-border); border-radius: 10px; padding: 11px 15px; width: fit-content; }
+  .piprow .d { color: var(--c-com); }
+  .piprow code { font-family: ui-monospace, Menlo, monospace; font-size: 14px; color: var(--code-text); }
+
+  section { padding-top: 40px; scroll-margin-top: 16px; }
+  section > h2 { font-size: 23px; font-weight: 780; letter-spacing: -0.02em; padding-bottom: 8px; border-bottom: 1px solid var(--border-soft); }
+  section > p { color: var(--text-dim); margin: 12px 0; }
+  h3 { font-size: 16px; font-weight: 700; margin: 22px 0 6px; }
+  p code, li code, td code {
+    font-family: ui-monospace, Menlo, monospace; font-size: 13px;
+    background: var(--accent-soft); padding: 1px 6px; border-radius: 5px; color: var(--text);
+  }
+  ul, ol { margin: 10px 0 10px 22px; color: var(--text-dim); }
+  li { margin: 4px 0; }
+  li::marker { color: var(--text-faint); }
+
+  /* ---------- Function entry ---------- */
+  .fn { border: 1px solid var(--border); border-radius: var(--radius); margin: 16px 0; overflow: hidden; background: var(--bg); }
+  .fn > .sig { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; padding: 12px 16px; background: var(--code-bg); border-bottom: 1px solid var(--border-soft); }
+  .fn > .sig code { font-family: ui-monospace, Menlo, monospace; font-size: 13.5px; color: var(--code-text); }
+  .fn > .sig .name { color: var(--c-fn); font-weight: 650; }
+  .fn > .sig .ret { margin-left: auto; font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--text-faint); }
+  .fn > .doc { padding: 12px 16px 15px; }
+  .fn > .doc p:first-child { margin-top: 0; }
+  .fn > .doc p { font-size: 14.5px; margin: 8px 0; color: var(--text-dim); }
+
+  /* ---------- Method pill ---------- */
+  .m { font-family: ui-monospace, Menlo, monospace; font-size: 10px; font-weight: 700; letter-spacing: .05em; padding: 2px 7px; border-radius: 999px; text-transform: uppercase; }
+  .m.get { color: var(--gram); background: var(--gram-soft); }
+  .m.post { color: var(--accent); background: var(--accent-soft); }
+
+  /* ---------- Params table ---------- */
+  .tbl { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; margin: 12px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th, td { text-align: left; padding: 8px 13px; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+  th { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-faint); background: var(--code-bg); font-weight: 700; }
+  tr:last-child td { border-bottom: none; }
+  td:first-child code { background: none; padding: 0; color: var(--text); font-weight: 600; }
+  td .t { color: var(--text-faint); font-size: 12px; }
+
+  /* ---------- Code blocks ---------- */
+  pre { background: var(--code-bg); border: 1px solid var(--code-border); border-radius: 10px; padding: 14px 16px; overflow-x: auto; margin: 12px 0; }
+  pre code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 13px; line-height: 1.7; color: var(--code-text); white-space: pre; }
+  .c { color: var(--c-com); } .s { color: var(--c-str); } .k { color: var(--c-kw); } .n { color: var(--c-num); } .f { color: var(--c-fn); }
+
+  /* ---------- Callout ---------- */
+  .note { display: flex; gap: 11px; border: 1px solid var(--border); border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 9px; padding: 12px 15px; margin: 14px 0; font-size: 14px; color: var(--text); }
+  .note.gram { border-left-color: var(--gram); background: var(--gram-soft); }
+  .note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+  .note .ic { flex: none; }
+
+  /* ---------- Chips ---------- */
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin: 12px 0; }
+  .chip { font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; padding: 4px 10px; border-radius: 7px; background: var(--code-bg); border: 1px solid var(--border); color: var(--text-dim); }
+
+  /* ---------- Comparison table ---------- */
+  .cmp { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); margin: 14px 0; }
+  .cmp table td:first-child { font-weight: 600; color: var(--text); white-space: nowrap; }
+
+  footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border-soft); color: var(--text-faint); font-size: 13px; }
+
+  /* ---------- Theme toggle ---------- */
+  .toggle { width: 34px; height: 34px; border-radius: 9px; cursor: pointer; border: 1px solid var(--border);
+    background: var(--bg); color: var(--text); display: grid; place-items: center; }
+  .toggle:hover { border-color: var(--accent); }
+  .toggle svg { width: 17px; height: 17px; }
+  .toggle .moon { display: none; }
+  :root[data-theme="dark"] .toggle .sun, :root:not([data-theme="light"]) .toggle .sun { display: none; }
+  :root[data-theme="dark"] .toggle .moon, :root:not([data-theme="light"]) .toggle .moon { display: block; }
+  @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .toggle .sun { display: block; } :root:not([data-theme="dark"]) .toggle .moon { display: none; } }
+
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: 1fr; }
+    aside { display: none; }
+    main { padding: 0 20px 90px; }
+  }
+</style>
+
+<div class="shell">
+  <aside>
+    <div class="brand">
+      <span class="mark"></span>
+      <span><b>faportalsmp</b><small>Portals Marketplace · async Python</small></span>
+    </div>
+    <div class="navgroup">
+      <p>Getting started</p>
+      <nav>
+        <a href="#overview">Overview</a>
+        <a href="#install">Installing</a>
+        <a href="#limits">Limits</a>
+      </nav>
+    </div>
+    <div class="navgroup">
+      <p>Usage</p>
+      <nav>
+        <a href="#auth">Authentication</a>
+        <a href="#gifts">Working with gifts</a>
+        <a href="#offers">Working with offers</a>
+        <a href="#account">Working with your account</a>
+        <a href="#wallet">Wallet · GRAM</a>
+      </nav>
+    </div>
+    <div class="navgroup">
+      <p>Reference</p>
+      <nav>
+        <a href="#objects">Objects</a>
+        <a href="#exceptions">Exceptions</a>
+      </nav>
+    </div>
+    <div class="navgroup">
+      <p>Info</p>
+      <nav>
+        <a href="#contacts">Contacts &amp; donations</a>
+      </nav>
+    </div>
+  </aside>
+
+  <main>
+    <div class="wrap">
+      <div class="topbar">
+        <span class="crumb"><b>faportalsmp</b> · documentation</span>
+        <button class="toggle" id="themeBtn" aria-label="Toggle theme" title="Toggle theme">
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <svg class="moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
+      </div>
+
+      <header class="hero" id="overview">
+        <h1>faportalsmp</h1>
+        <p>An asynchronous Python library for the Portals Gift Marketplace — a maintained fork of <span class="mono">aportalsmp</span>. Trade Telegram gifts, place offers, run giveaways, read your account, and deposit &amp; withdraw GRAM.</p>
+        <div class="piprow"><span class="d mono">$</span><code>pip install faportalsmp</code></div>
+        <p class="mono" style="font-size:13px;color:var(--text-faint)">import aportalsmp as portals</p>
+      </header>
+
+      <section id="what">
+        <h2>What this fork adds over aportalsmp</h2>
+        <p>Same library, brought in line with the current marketplace and extended. Nothing to relearn — existing code keeps working.</p>
+        <div class="cmp">
+          <table>
+            <thead><tr><th>Area</th><th>aportalsmp</th><th>faportalsmp</th></tr></thead>
+            <tbody>
+              <tr><td>Wallet</td><td>Withdraw only</td><td>GRAM deposit (intent + auto-send) &amp; withdraw, status, limits, history</td></tr>
+              <tr><td>Gift list</td><td>Static</td><td>Regenerated from the live API + generator script; swapped IDs fixed</td></tr>
+              <tr><td>Name lookup</td><td>Exact / cased</td><td>Case-, apostrophe- and hyphen-insensitive</td></tr>
+              <tr><td>Python</td><td>3.10+ in practice</td><td>Runs on 3.8+</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="install">
+        <h2>Installing</h2>
+        <p>Requires Python 3.8+. Everything — including GRAM deposit auto-send — is included in the single install.</p>
+        <pre><code>pip install faportalsmp</code></pre>
+        <p>Then import the package as <code>aportalsmp</code>:</p>
+        <pre><code><span class="k">import</span> aportalsmp <span class="k">as</span> portals</code></pre>
+      </section>
+
+      <section id="limits">
+        <h2>Limits</h2>
+        <p>Practical limits enforced by the API and the library:</p>
+        <ul>
+          <li><b>search / lists</b> — up to <code>100</code> items per request; paginate with <code>offset</code> (increment by <code>limit</code>).</li>
+          <li><b>offer expiration</b> — <code>expiration_days</code> must be <code>7</code> or <code>0</code> (no expiration).</li>
+          <li><b>offer price</b> — edits require a value <code>&gt;= 0.5</code> GRAM.</li>
+          <li><b>wallet</b> — deposit/withdraw minimums, maximums and the daily limit are returned by <a href="#wallet-limits"><code>walletLimits()</code></a>.</li>
+        </ul>
+      </section>
+
+      <section id="auth">
+        <h2>Authentication</h2>
+        <p>Every call takes an <code>authData</code> string — a Telegram Mini App <span class="mono">initData</span> prefixed with <code>tma&nbsp;</code>. Generate it from a user session with <code>update_auth()</code>.</p>
+        <div class="fn">
+          <div class="sig"><code><span class="k">async def</span> <span class="name">update_auth</span>(api_id, api_hash, session_string, session_path, session_name)</code><span class="ret">→ str</span></div>
+          <div class="doc">
+            <p>Opens the Portals Mini App as your Telegram user and returns the <span class="mono">tma&nbsp;…</span> authData string. Provide either <code>api_id</code> + <code>api_hash</code>, or an existing <code>session_string</code>.</p>
+            <pre><code><span class="k">from</span> aportalsmp <span class="k">import</span> update_auth
+
+authData = <span class="k">await</span> <span class="f">update_auth</span>(api_id=<span class="n">12345</span>, api_hash=<span class="s">"abc..."</span>, session_name=<span class="s">"account"</span>)
+<span class="c"># or</span>
+authData = <span class="k">await</span> <span class="f">update_auth</span>(session_string=<span class="s">"BQ..."</span>)</code></pre>
+          </div>
+        </div>
+        <div class="note"><span class="ic">🔑</span><div>Pass the returned <b>tma …</b> string as <code>authData=</code> to every function below.</div></div>
+      </section>
+
+      <section id="gifts">
+        <h2>Working with gifts</h2>
+        <p>Read floors and listings, then buy, list, re-price, transfer or withdraw gifts.</p>
+
+        <div class="fn" id="search">
+          <div class="sig"><code><span class="k">async def</span> <span class="name">search</span>(sort, offset, limit, gift_name, model, backdrop, symbol, min_price, max_price, exclude_bundled, premarket_status, authData)</code><span class="ret">→ list[PortalsGift]</span></div>
+          <div class="doc">
+            <p>Search listed gifts with filters and sorting.</p>
+            <div class="tbl"><table>
+              <thead><tr><th>Parameter</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>sort</code> <span class="t">str</span></td><td><code>price_asc</code> (default), <code>price_desc</code>, <code>latest</code>, <code>gift_id_asc/desc</code>, <code>model_rarity_asc/desc</code></td></tr>
+                <tr><td><code>gift_name</code> <span class="t">str | list</span></td><td>Collection name(s); resolved leniently</td></tr>
+                <tr><td><code>model / backdrop / symbol</code></td><td>Attribute filters (str or list)</td></tr>
+                <tr><td><code>min_price / max_price</code> <span class="t">int</span></td><td>Price bounds in GRAM</td></tr>
+                <tr><td><code>limit / offset</code> <span class="t">int</span></td><td>≤ 100 per page; paginate with offset</td></tr>
+              </tbody>
+            </table></div>
+            <pre><code>gifts = <span class="k">await</span> portals.<span class="f">search</span>(
+    gift_name=<span class="s">"Plush Pepe"</span>, model=<span class="s">"Sad Cat"</span>,
+    backdrop=[<span class="s">"Onyx Black"</span>, <span class="s">"Midnight Blue"</span>],
+    sort=<span class="s">"price_asc"</span>, min_price=<span class="n">0</span>, max_price=<span class="n">5000</span>, limit=<span class="n">20</span>,
+    authData=authData,
+)</code></pre>
+          </div>
+        </div>
+
+        <div class="fn" id="buy">
+          <div class="sig"><code><span class="k">async def</span> <span class="name">buy</span>(nft_id, price, authData)</code><span class="ret">→ dict</span></div>
+          <div class="doc"><p>Buy a listing at <code>price</code> (GRAM). Returns the purchase result JSON (purchased / failed with reasons).</p>
+          <pre><code><span class="k">if</span> gifts:
+    result = <span class="k">await</span> portals.<span class="f">buy</span>(nft_id=gifts[<span class="n">0</span>].id, price=gifts[<span class="n">0</span>].price, authData=authData)</code></pre></div>
+        </div>
+
+        <div class="fn" id="sale">
+          <div class="sig"><code><span class="k">async def</span> <span class="name">sale</span>(nft_id, price, authData) · <span class="name">bulkList</span>(nfts, authData)</code><span class="ret">→ SaleResult</span></div>
+          <div class="doc"><p>List a single gift (<code>sale</code>) or many at once (<code>bulkList</code>, a list of <code>{"nft_id", "price"}</code>) for sale in GRAM.</p></div>
+        </div>
+
+        <p>The rest of the gifts module:</p>
+        <div class="tbl"><table>
+          <thead><tr><th>Function</th><th>Returns</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td><code>giftsFloors(authData)</code></td><td>GiftsFloors</td><td>Floor price of every collection (short names)</td></tr>
+            <tr><td><code>filterFloors(gift_name, authData)</code></td><td>Filters</td><td>Model / backdrop / symbol floors for a collection</td></tr>
+            <tr><td><code>collections(limit, authData)</code></td><td>Collections</td><td>Collections with floor, supply, volume</td></tr>
+            <tr><td><code>marketActivity(...)</code></td><td>list[Activity]</td><td>Recent buys / listings / offers / price updates</td></tr>
+            <tr><td><code>myPortalsGifts(offset, limit, listed, authData)</code></td><td>list[PortalsGift]</td><td>Gifts you own</td></tr>
+            <tr><td><code>myActivity(offset, limit, authData)</code></td><td>list[MyActivity]</td><td>Your activity</td></tr>
+            <tr><td><code>changePrice(nft_id, price, authData)</code></td><td>None</td><td>Re-price a listing</td></tr>
+            <tr><td><code>transferGifts(nft_ids, username, anonymous, authData)</code></td><td>None</td><td>Transfer gifts to a user</td></tr>
+            <tr><td><code>withdrawGifts(nft_ids, authData)</code></td><td>None</td><td>Withdraw gifts out of the marketplace</td></tr>
+            <tr><td><code>getGiveaways / giveawayInfo / joinGiveaway</code></td><td>Giveaway…</td><td>Browse and join giveaways</td></tr>
+          </tbody>
+        </table></div>
+        <div class="note"><span class="ic">🧠</span><div>Gift names resolve leniently — <code>"plush pepe"</code>, <code>"Durov's Cap"</code> and <code>"Durov’s Cap"</code> all match. Refresh the collection list any time with <span class="mono">python scripts/update_collections.py</span>.</div></div>
+      </section>
+
+      <section id="offers">
+        <h2>Working with offers</h2>
+        <p>Per-gift offers and collection-wide offers.</p>
+        <pre><code><span class="c"># single-gift offers</span>
+<span class="k">await</span> portals.<span class="f">makeOffer</span>(nft_id=<span class="s">"..."</span>, offer_price=<span class="n">10</span>, expiration_days=<span class="n">7</span>, authData=authData)
+<span class="k">await</span> portals.<span class="f">editOffer</span>(offer_id=<span class="s">"..."</span>, new_price=<span class="n">12</span>, authData=authData)
+<span class="k">await</span> portals.<span class="f">cancelOffer</span>(offer_id=<span class="s">"..."</span>, authData=authData)
+
+<span class="c"># collection-wide offers</span>
+<span class="k">await</span> portals.<span class="f">collectionOffer</span>(gift_name=<span class="s">"Plush Pepe"</span>, amount=<span class="n">100</span>, max_nfts=<span class="n">3</span>, authData=authData)
+top = <span class="k">await</span> portals.<span class="f">topOffer</span>(gift_name=<span class="s">"Plush Pepe"</span>, authData=authData)</code></pre>
+        <div class="chips">
+          <span class="chip">editCollectionOffer</span><span class="chip">cancelCollectionOffer</span><span class="chip">allCollectionOffers</span>
+          <span class="chip">myCollectionOffers</span><span class="chip">myReceivedOffers</span><span class="chip">myPlacedOffers</span>
+        </div>
+      </section>
+
+      <section id="account">
+        <h2>Working with your account</h2>
+        <p>Points, stats and balances. Balances are denominated in <b>GRAM</b>.</p>
+        <div class="tbl"><table>
+          <thead><tr><th>Function</th><th>Returns</th><th>Fields</th></tr></thead>
+          <tbody>
+            <tr><td><code>myPoints(authData)</code></td><td>Points</td><td>total_points, purchase/sell/referral/bonus points &amp; counts</td></tr>
+            <tr><td><code>myStats(authData)</code></td><td>Stats</td><td>total_bought, total_sold, total_volume</td></tr>
+            <tr><td><code>myBalances(authData)</code></td><td>Balances</td><td>balance, frozen_funds (GRAM)</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <section id="wallet">
+        <h2>Wallet · GRAM</h2>
+        <div class="note gram"><span class="ic">💎</span><div><b>GRAM</b> is the native coin, moved on the <b>TON</b> network. Amounts and balances are in GRAM; wallet addresses, TON Connect and the on-chain transfer are TON-network.</div></div>
+
+        <h3 id="deposit">Deposit GRAM</h3>
+        <p>A deposit is a native GRAM transfer to the Portals deposit wallet carrying a text comment equal to the <b>deposit id</b> — that is how the marketplace credits your balance.</p>
+
+        <div class="fn">
+          <div class="sig"><span class="m post">post</span> <code><span class="k">async def</span> <span class="name">deposit</span>(amount, mnemonic, address, wallet_version, authData)</code><span class="ret">→ DepositInfo</span></div>
+          <div class="doc">
+            <p><b>Intent</b> — pass only <code>authData</code> to mint a deposit and get where/how to send GRAM. <b>Auto-send</b> — also pass a <code>mnemonic</code> (+ <code>amount</code>) and the library signs &amp; broadcasts the transfer via pytoniq.</p>
+            <div class="tbl"><table>
+              <thead><tr><th>Parameter</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>amount</code> <span class="t">float</span></td><td>GRAM to deposit (required for auto-send)</td></tr>
+                <tr><td><code>mnemonic</code> <span class="t">str | list</span></td><td>24-word wallet mnemonic; enables auto-send. Used only to sign, never transmitted</td></tr>
+                <tr><td><code>wallet_version</code> <span class="t">str</span></td><td><code>v4r2</code> (default), <code>v3r2</code>, <code>v3r1</code>, <code>v5r1</code></td></tr>
+                <tr><td><code>address</code> <span class="t">str</span></td><td>Override the destination (normally from the API)</td></tr>
+              </tbody>
+            </table></div>
+            <pre><code><span class="c"># intent — send GRAM yourself</span>
+info = <span class="k">await</span> portals.<span class="f">deposit</span>(authData=authData)
+info.address   <span class="c"># where to send GRAM</span>
+info.comment   <span class="c"># text comment to attach (the deposit id)</span>
+
+<span class="c"># auto-send — library signs &amp; broadcasts</span>
+info = <span class="k">await</span> portals.<span class="f">deposit</span>(
+    amount=<span class="n">0.5</span>, mnemonic=<span class="s">"word1 ... word24"</span>, wallet_version=<span class="s">"v4r2"</span>, authData=authData,
+)
+info.sent_tx   <span class="c"># {'status': 'sent', 'amount': 0.5, 'to': ..., 'comment': ...}</span></code></pre>
+          </div>
+        </div>
+
+        <div class="fn">
+          <div class="sig"><span class="m get">get</span> <code><span class="k">async def</span> <span class="name">depositStatus</span>(ids, authData)</code><span class="ret">→ list[DepositStatus]</span></div>
+          <div class="doc"><p>Poll one or more deposits by id. Omit <code>ids</code> for recent deposits.</p></div>
+        </div>
+
+        <h3 id="withdraw">Withdraw GRAM</h3>
+        <div class="fn">
+          <div class="sig"><span class="m post">post</span> <code><span class="k">async def</span> <span class="name">withdrawGram</span>(amount, wallet, authData)</code><span class="ret">→ str</span></div>
+          <div class="doc">
+            <p>Withdraw GRAM to an external TON address. Returns the withdrawal id.</p>
+            <pre><code>wid = <span class="k">await</span> portals.<span class="f">withdrawGram</span>(amount=<span class="n">1.0</span>, wallet=<span class="s">"UQ...address"</span>, authData=authData)
+statuses = <span class="k">await</span> portals.<span class="f">withdrawStatus</span>(ids=wid, authData=authData)</code></pre>
+            <p class="mono" style="font-size:12.5px;color:var(--text-faint)"># withdrawPortals and withdrawTon are aliases of withdrawGram</p>
+          </div>
+        </div>
+
+        <div class="fn" id="wallet-limits">
+          <div class="sig"><span class="m get">get</span> <code><span class="k">async def</span> <span class="name">walletLimits</span>(authData) · <span class="name">walletHistory</span>(offset, limit, authData) · <span class="name">withdrawStatus</span>(ids, authData)</code></div>
+          <div class="doc"><p><code>walletLimits</code> → min/max amounts, daily limit &amp; fees. <code>walletHistory</code> → deposits, withdrawals and trades. <code>withdrawStatus</code> → poll withdrawals by id.</p></div>
+        </div>
+      </section>
+
+      <section id="objects">
+        <h2>Objects</h2>
+        <p>Responses are wrapped in lightweight objects with typed properties and a <code>.toDict()</code> escape hatch to the raw API dict.</p>
+        <div class="chips">
+          <span class="chip">PortalsGift</span><span class="chip">DepositInfo</span><span class="chip">DepositStatus</span><span class="chip">WithdrawStatus</span>
+          <span class="chip">WalletLimits</span><span class="chip">WalletHistory</span><span class="chip">Balances</span><span class="chip">Points</span>
+          <span class="chip">Stats</span><span class="chip">Filters</span><span class="chip">GiftsFloors</span><span class="chip">Collections</span>
+          <span class="chip">CollectionItem</span><span class="chip">Activity</span><span class="chip">MyActivity</span><span class="chip">SaleResult</span>
+          <span class="chip">CollectionOffer</span><span class="chip">GiftOffer</span><span class="chip">Giveaway</span><span class="chip">GiveawayRequirements</span>
+        </div>
+        <pre><code>gift = (<span class="k">await</span> portals.<span class="f">search</span>(gift_name=<span class="s">"Plush Pepe"</span>, limit=<span class="n">1</span>, authData=authData))[<span class="n">0</span>]
+gift.name, gift.model, gift.backdrop, gift.symbol, gift.price
+gift.<span class="f">toDict</span>()   <span class="c"># raw API dict</span></code></pre>
+      </section>
+
+      <section id="exceptions">
+        <h2>Exceptions</h2>
+        <p>All errors subclass <code>Exception</code> and are importable from <code>aportalsmp</code>.</p>
+        <div class="chips">
+          <span class="chip">authDataError</span><span class="chip">requestError</span><span class="chip">connectionError</span><span class="chip">accountError</span>
+          <span class="chip">tradingError</span><span class="chip">offerError</span><span class="chip">floorsError</span><span class="chip">giftsError</span>
+        </div>
+        <pre><code><span class="k">from</span> aportalsmp <span class="k">import</span> requestError
+
+<span class="k">try</span>:
+    <span class="k">await</span> portals.<span class="f">buy</span>(nft_id=<span class="s">"..."</span>, price=<span class="n">1.0</span>, authData=authData)
+<span class="k">except</span> requestError <span class="k">as</span> e:
+    <span class="f">print</span>(<span class="s">"API error:"</span>, e)</code></pre>
+      </section>
+
+      <section id="contacts">
+        <h2>Contacts &amp; donations</h2>
+        <p>Source &amp; issues: <a href="https://github.com/thebrainair/faportalsmp">github.com/thebrainair/faportalsmp</a>.</p>
+        <div class="note warn"><span class="ic">⚠️</span><div>Unofficial library, not affiliated with Portals. Trading and GRAM transfers move real assets — test with small amounts and keep your mnemonics safe.</div></div>
+      </section>
+
+      <footer>
+        <p class="mono">faportalsmp · async Python client for the Portals Gift Marketplace · fork of aportalsmp</p>
+      </footer>
+    </div>
+  </main>
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById('themeBtn');
+    var root = document.documentElement;
+    btn.addEventListener('click', function () {
+      var cur = root.getAttribute('data-theme');
+      if (!cur) cur = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      root.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+    });
+  })();
+</script>

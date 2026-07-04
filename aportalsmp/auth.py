@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pyrogram import Client
 from pyrogram.raw.functions.messages import RequestAppWebView
 from pyrogram.raw.types import InputBotAppShortName, InputUser

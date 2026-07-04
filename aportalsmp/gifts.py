@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from typing import Optional
 
 from .utils.other import API_URL, HEADERS_MAIN, SORTS
-from .utils.functions import toShortName, cap, listToURL, activityListToURL
+from .utils.functions import toShortName, cap, listToURL, activityListToURL, resolve_collection_id
 from .utils.collections_ids import collections_ids
 from .handlers import requestExceptionHandler, fetch
 from .classes.Exceptions import authDataError, floorsError, giftsError, tradingError
@@ -176,7 +178,7 @@ async def search(sort: str = "price_asc",
     if gift_name:
         if type(gift_name) == str:
             # ТУт нейм в айди конверт
-            gift_id = collections_ids.get(cap(gift_name))
+            gift_id = resolve_collection_id(gift_name)
             if gift_id:
                 URL += f"&collection_ids={gift_id}"
             else:
@@ -185,7 +187,7 @@ async def search(sort: str = "price_asc",
             # Тут список неймов в айди конверт
             gift_ids = []
             for name in gift_name:
-                gift_id = collections_ids.get(cap(name))
+                gift_id = resolve_collection_id(name)
                 if gift_id:
                     gift_ids.append(gift_id)
                 else:

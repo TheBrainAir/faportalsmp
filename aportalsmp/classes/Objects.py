@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ..utils.functions import cap
 
 class PortalsGift:
@@ -275,7 +277,176 @@ class Balances:
     @property
     def frozen_funds(self):
         return float(self.__dict__.get("frozen_funds", 0))
-    
+
+class DepositInfo:
+    """
+    Result of creating a TON deposit (POST /deposits).
+
+    Wraps whatever the API returns and exposes the fields needed to complete
+    the on-chain transfer: the destination ``address``, the ``amount`` and the
+    text ``comment`` (deposit id) that must be attached to the transaction so
+    Portals can credit the balance.
+    """
+    def __init__(self, data):
+        if isinstance(data, dict):
+            self.__dict__ = data
+        elif isinstance(data, str):
+            self.__dict__ = {"id": data}
+        else:
+            self.__dict__ = {}
+
+    def toDict(self):
+        return self.__dict__
+
+    @property
+    def id(self):
+        return self.__dict__.get("id") or self.__dict__.get("deposit_id")
+
+    @property
+    def address(self):
+        for key in ("wallet_address", "address", "deposit_address", "destination", "to"):
+            value = self.__dict__.get(key)
+            if value:
+                return value
+        return None
+
+    @property
+    def amount(self):
+        value = self.__dict__.get("amount")
+        return float(value) if value not in (None, "") else None
+
+    @property
+    def comment(self):
+        return self.__dict__.get("comment") or self.__dict__.get("payload") or self.id
+
+    @property
+    def status(self):
+        return self.__dict__.get("status")
+
+    @property
+    def sent_tx(self):
+        """Details of the transaction sent by deposit()'s auto-send mode (if any)."""
+        return self.__dict__.get("_sent_tx")
+
+class DepositStatus:
+    def __init__(self, data: dict):
+        self.__dict__ = data if isinstance(data, dict) else {}
+
+    def toDict(self):
+        return self.__dict__
+
+    @property
+    def id(self):
+        return self.__dict__.get("id") or self.__dict__.get("deposit_id")
+
+    @property
+    def status(self):
+        return self.__dict__.get("status")
+
+    @property
+    def amount(self):
+        value = self.__dict__.get("amount")
+        return float(value) if value not in (None, "") else None
+
+    @property
+    def created_at(self):
+        return self.__dict__.get("created_at")
+
+    @property
+    def updated_at(self):
+        return self.__dict__.get("updated_at")
+
+class WithdrawStatus:
+    def __init__(self, data: dict):
+        self.__dict__ = data if isinstance(data, dict) else {}
+
+    def toDict(self):
+        return self.__dict__
+
+    @property
+    def id(self):
+        return self.__dict__.get("id") or self.__dict__.get("withdrawal_id")
+
+    @property
+    def status(self):
+        return self.__dict__.get("status")
+
+    @property
+    def amount(self):
+        value = self.__dict__.get("amount")
+        return float(value) if value not in (None, "") else None
+
+    @property
+    def external_address(self):
+        return self.__dict__.get("external_address") or self.__dict__.get("address")
+
+    @property
+    def created_at(self):
+        return self.__dict__.get("created_at")
+
+class WalletLimits:
+    def __init__(self, data: dict):
+        self.__dict__ = data if isinstance(data, dict) else {}
+
+    def toDict(self):
+        return self.__dict__
+
+    def _num(self, *keys):
+        for key in keys:
+            value = self.__dict__.get(key)
+            if value not in (None, ""):
+                return float(value)
+        return None
+
+    @property
+    def min_deposit(self):
+        return self._num("min_deposit", "min_deposit_amount")
+
+    @property
+    def min_withdraw(self):
+        return self._num("min_withdraw", "min_withdraw_amount", "min_amount")
+
+    @property
+    def max_withdraw(self):
+        return self._num("max_withdraw", "max_withdraw_amount", "max_amount")
+
+    @property
+    def daily_limit(self):
+        return self._num("daily_limit")
+
+    @property
+    def withdraw_fee(self):
+        return self._num("withdraw_fee", "fee")
+
+class WalletHistory:
+    """A single wallet history entry (deposit / withdrawal / trade)."""
+    def __init__(self, data: dict):
+        self.__dict__ = data if isinstance(data, dict) else {}
+
+    def toDict(self):
+        return self.__dict__
+
+    @property
+    def id(self):
+        return self.__dict__.get("id")
+
+    @property
+    def type(self):
+        return self.__dict__.get("type")
+
+    @property
+    def status(self):
+        return self.__dict__.get("status")
+
+    @property
+    def amount(self):
+        value = self.__dict__.get("amount")
+        return float(value) if value not in (None, "") else None
+
+    @property
+    def created_at(self):
+        return self.__dict__.get("created_at")
+
 class Filters:
     def __init__(self, data: dict):
         self.__dict__ = data
